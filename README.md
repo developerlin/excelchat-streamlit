@@ -1,6 +1,12 @@
 # ExcelChat
 ExcelChat is a AI powered lite app built on pandas-ai and streamlit. Upload an excel file, then you can chat with it like chatGPT.
 
+Currently the following models are supported. 
+ * OpenAI
+ * Ollama: starcoder:7b, codellama:7b-instruct-q8_0, zephyr:7b-alpha-q8_0 
+ * Baidu/AIStudio-Ernie-Bot, baidu ernie-bot model for ai studio (single thread mode, not suitable for multi-tenant usage)
+ * Baidu/Qianfan-Ernie-Bot, the recommended way to use baidu ernie bot model
+
 Here are some screenshot.
 
 ![Screenshot1](docs/images/screen1.png?raw=true)
