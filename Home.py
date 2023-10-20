@@ -175,7 +175,8 @@ with st.sidebar:
     file = st.file_uploader("Upload File", type=["xlsx"])
     if file is None:
         st.session_state.uploaded = False
-        get_agent(st.session_state.agent_id).start_new_conversation()
+        if st.session_state.llm_ready:
+            get_agent(st.session_state.agent_id).start_new_conversation()
 
     if file is not None:
         file_obj = io.BytesIO(file.getvalue())
