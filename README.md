@@ -7,6 +7,9 @@ Here are some screenshot.
 ![Screenshot2](docs/images/screen2.png?raw=true)
 ![Screenshot3](docs/images/screen3.png?raw=true)
 
+## Demo
+ https://excelchat.streamlit.app
+
 ## Requirements
 Python >= 3.9.
 
