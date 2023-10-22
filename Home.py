@@ -1,6 +1,7 @@
 import io
 import logging
 import uuid
+from typing import Dict
 
 import pandas as pd
 import streamlit as st
@@ -266,7 +267,7 @@ if prompt is not None:
                 tmp.dataframe(response.dataframe)
                 st.session_state.chat_history.append(
                     {"role": "assistant", "content": response.dataframe, "type": "dataframe"})
-            elif "type" in response and response["type"] == "plot":
+            elif isinstance(response, Dict) and "type" in response and response["type"] == "plot":
                 tmp.image(f"{response['value']}")
                 st.session_state.chat_history.append(
                     {"role": "assistant", "content": response["value"], "type": "plot"})
