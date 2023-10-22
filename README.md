@@ -1,5 +1,5 @@
 # ExcelChat
-ExcelChat is a AI powered lite app built on [pandas-ai](https://github.com/gventuri/pandas-ai) and [streamlit](https://github.com/streamlit/streamlit). Upload an excel file, then you can chat with it like chatGPT.
+ExcelChat is a AI powered app built on [pandas-ai](https://github.com/gventuri/pandas-ai) and [streamlit](https://github.com/streamlit/streamlit). Upload an excel file, then you can chat with it like chatGPT.
 
 Currently the following models are supported. 
  * OpenAI
