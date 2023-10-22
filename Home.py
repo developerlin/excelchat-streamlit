@@ -1,6 +1,7 @@
 import io
 import logging
 import uuid
+from pathlib import Path
 from typing import Dict
 
 import pandas as pd
@@ -53,9 +54,7 @@ class AgentWrapper:
             st.toast("LLM initialization failed, check LLM configuration", icon="🫤")
         return llm
 
-    def set_file_data(self, file_obj):
-        df = pd.read_excel(file_obj)
-        grid.dataframe(df)
+    def set_file_data(self, df):
         counter.info("Total: **%s** Records" % len(df))
         llm = self.get_llm()
         if llm is not None:
@@ -192,7 +191,7 @@ if not st.session_state.llm_ready:
 
 with st.sidebar:
     st.divider()
-    file = st.file_uploader("Upload File", type=["xlsx"])
+    file = st.file_uploader("Upload File", type=["xlsx", "csv"])
     if file is None:
         st.session_state.uploaded = False
         if st.session_state.llm_ready:
@@ -200,13 +199,17 @@ with st.sidebar:
 
     if file is not None:
         file_obj = io.BytesIO(file.getvalue())
-        df = pd.read_excel(file_obj)
+        file_ext = Path(file.name).suffix.lower()
+        if file_ext == ".csv":
+            df = pd.read_csv(file_obj)
+        else:
+            df = pd.read_excel(file_obj)
         grid.dataframe(df)
         counter.info("Total: **%s** records" % len(df))
 
         # if not st.session_state.llm_ready:
         st.session_state.agent_id = str(uuid.uuid4())
-        get_agent(st.session_state.agent_id).set_file_data(file_obj)
+        get_agent(st.session_state.agent_id).set_file_data(df)
         st.session_state.llm_ready = True
 
 with st.sidebar:
