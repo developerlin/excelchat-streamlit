@@ -15,7 +15,14 @@ from util import get_open_ai_model, get_ollama_model, get_baidu_as_model, get_pr
 
 logger = Logger()
 
+# page settings
+st.set_page_config(page_title="Excel Chat", layout="wide")
+st.header("What ExcelChat can do?")
+st.text("ExcelChat is a lightweight data analysis app powered by LLM, showcasing how LLM can revolutionize the future"
+        "of data analysis.")
 
+
+# st.top
 class AgentWrapper:
     id: str
     agent: Agent
@@ -88,8 +95,14 @@ if "llm_ready" not in st.session_state:
 # if "agent_id" not in st.session_state:
 #     st.session_state.agent_id = str(uuid.uuid4())
 
-# page settings
-st.set_page_config(page_title="Excel Chat", layout="wide")
+# Description
+tab1, tab2 = st.tabs(["Workspace", "Screenshots"])
+with tab2:
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image("docs/images/short1.png")
+    with col2:
+        st.image("docs/images/short2.png")
 
 # DataGrid
 with st.expander("DataGrid Content") as ep:
@@ -116,18 +129,21 @@ with st.sidebar:
 
     # Initialize model configration panel
     if option == "OpenAI":
-        api_token = st.text_input("API Token", st.session_state.api_token)
+        api_token = st.text_input("API Token", st.session_state.api_token, type="password", placeholder="Api token")
     elif option == "Baidu/AIStudio-Ernie-Bot":
-        access_token = st.text_input("Access Token", st.session_state.access_token)
+        access_token = st.text_input("Access Token", st.session_state.access_token, type="password",
+                                     placeholder="Access token")
     elif option == "Baidu/Qianfan-Ernie-Bot":
-        client_id = st.text_input("Client ID", st.session_state.client_id)
-        client_secret = st.text_input("Client Secret", st.session_state.client_secret)
+        client_id = st.text_input("Client ID", st.session_state.client_id, placeholder="Client ID")
+        client_secret = st.text_input("Client Secret", st.session_state.client_secret, type="password",
+                                      placeholder="Client Secret")
     elif option == "Ollama":
         ollama_model = st.selectbox(
             "Choose Ollama Model",
             ["starcoder:7b", "codellama:7b-instruct-q8_0", "zephyr:7b-alpha-q8_0"]
         )
-        ollama_base_url = st.text_input("Ollama BaseURL", st.session_state.ollama_base_url or "http://localhost:11434")
+        ollama_base_url = st.text_input("Ollama BaseURL", st.session_state.ollama_base_url,
+                                        placeholder="http://localhost:11434")
 
     # Validation
     info = st.markdown("")
@@ -188,6 +204,26 @@ with st.sidebar:
         st.session_state.agent_id = str(uuid.uuid4())
         get_agent(st.session_state.agent_id).set_file_data(file_obj)
         st.session_state.llm_ready = True
+
+with st.sidebar:
+    st.markdown("""
+    <style>
+        .tw_share {
+            position: fixed;
+            display: block;
+            left: 240px;
+            bottom: 20px;
+            cursor: pointer;
+        }
+        
+        .tw_share:hover svg path {
+            fill: #1da1f2
+        }
+    </style>
+    <a class="tw_share" target="_blank" href="https://twitter.com/intent/tweet?url=https://excelchat.streamlit.app/&text=ExcelChat%20-%20LLM%20revolutionize%20the%20future%20of%20data%20analysis">
+        <svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg" class="socialCallout_Icon__cnbtq"><path d="M22.9683 0.526535C22.5928 1.56402 21.8955 2.36683 20.9031 2.95968C21.368 2.91851 21.8239 2.83205 22.271 2.71678C22.7225 2.60562 23.1561 2.45741 23.5986 2.28449C23.5986 2.32566 23.5763 2.34625 23.5629 2.36683C22.946 3.19435 22.1994 3.91071 21.3233 4.51179C21.2428 4.56943 21.207 4.61883 21.2115 4.71764C21.2651 6.1133 21.0595 7.47603 20.6214 8.81405C20.1029 10.3867 19.3072 11.8277 18.2119 13.1287C16.9334 14.6478 15.3554 15.8376 13.469 16.6693C12.3156 17.1798 11.1042 17.5174 9.8391 17.7068C9.10597 17.8138 8.37284 17.8673 7.63078 17.8797C5.98571 17.9044 4.38982 17.6656 2.83863 17.1674C1.87305 16.8545 0.952171 16.4428 0.0804651 15.9365C0.0536434 15.92 0.0178811 15.9118 0 15.8788C2.633 16.1217 5.00672 15.5206 7.11669 14.0426C5.87395 13.9809 4.79662 13.5774 3.89362 12.787C3.29907 12.2682 2.87886 11.6465 2.62406 10.9178C3.34824 11.0372 4.05902 11.0208 4.79215 10.8478C3.3393 10.5308 2.24408 9.7939 1.52437 8.61232C1.10863 7.93301 0.920879 7.19607 0.925349 6.40149C1.60483 6.7432 2.32008 6.92847 3.10238 6.9614C2.93698 6.84201 2.78052 6.7432 2.64194 6.62793C1.82835 5.96921 1.29638 5.15404 1.07287 4.18243C0.822532 3.09554 0.992403 2.06218 1.5646 1.08645C1.61824 0.991756 1.62271 0.995873 1.69424 1.0741C2.70452 2.19392 3.88468 3.13259 5.23917 3.88189C6.67413 4.67647 8.22085 5.20756 9.87039 5.4834C10.4113 5.57398 10.9567 5.63161 11.5065 5.66043C11.5914 5.66455 11.6183 5.66043 11.6004 5.56574C11.3053 4.10009 11.6674 2.79088 12.7403 1.67106C13.5271 0.843544 14.5284 0.357738 15.7131 0.221878C17.1167 0.0571976 18.3729 0.398908 19.4726 1.23054C19.6022 1.32935 19.7184 1.43227 19.8347 1.54343C19.8749 1.58049 19.9106 1.58872 19.9732 1.58049C21.0059 1.38699 21.9714 1.04116 22.8834 0.559471C22.9057 0.543003 22.9236 0.522418 22.9683 0.526535Z" fill="#FFFFFF"></path></svg>
+    </a>
+    """, unsafe_allow_html=True)
 
 # ChatBox layout
 chat_history_key = "chat_history"
