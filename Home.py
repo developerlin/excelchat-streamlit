@@ -18,7 +18,7 @@ from util import get_open_ai_model, get_ollama_model, get_baidu_as_model, get_pr
 
 logger = Logger()
 
-matplotlib.rc_file(".matplotlib/.matplotlibrc");
+matplotlib.rc_file("./.matplotlib/.matplotlibrc");
 
 # page settings
 st.set_page_config(page_title="Excel Chat", layout="wide")
