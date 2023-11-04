@@ -4,6 +4,7 @@ import uuid
 from pathlib import Path
 from typing import Dict
 
+import matplotlib
 import pandas as pd
 import streamlit as st
 
@@ -16,6 +17,8 @@ from parser.response_parser import CustomResponseParser
 from util import get_open_ai_model, get_ollama_model, get_baidu_as_model, get_prompt_template, get_baidu_qianfan_model
 
 logger = Logger()
+
+matplotlib.rc_file(".matplotlib/.matplotlibrc");
 
 # page settings
 st.set_page_config(page_title="Excel Chat", layout="wide")
