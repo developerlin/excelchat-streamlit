@@ -26,7 +26,8 @@ st.header("What ExcelChat can do?")
 st.text("ExcelChat is a lightweight data analysis app powered by LLM, showcasing how LLM can revolutionize the future"
         "of data analysis.")
 st.markdown("""List of todos
- - [ ] Add memory
+ - [x] Add memory
+ - [x] Support non-latin text in chart
  - [ ] Sub questions support
 """)
 
@@ -58,7 +59,6 @@ class AgentWrapper:
         return llm
 
     def set_file_data(self, df):
-        counter.info("Total: **%s** Records" % len(df))
         llm = self.get_llm()
         if llm is not None:
             print("llm.type", llm.type)
@@ -73,8 +73,9 @@ class AgentWrapper:
                 enable_cache=False,
                 verbose=True
             )
-            self.agent = Agent(df, config=config, memory_size=1)
+            self.agent = Agent(df, config=config, memory_size=memory_size)
             self.agent._lake.add_middlewares(CustomChartsMiddleware())
+            st.session_state.llm_ready = True
 
     def chat(self, prompt):
         if self.agent is None:
@@ -91,15 +92,15 @@ class AgentWrapper:
 @st.cache_resource
 def get_agent(agent_id) -> AgentWrapper:
     agent = AgentWrapper()
-    st.session_state.llm_ready = True
     return agent
+
+chat_history_key = "chat_history"
+if chat_history_key not in st.session_state:
+    st.session_state[chat_history_key] = []
 
 
 if "llm_ready" not in st.session_state:
     st.session_state.llm_ready = False
-
-# if "agent_id" not in st.session_state:
-#     st.session_state.agent_id = str(uuid.uuid4())
 
 # Description
 tab1, tab2 = st.tabs(["Workspace", "Screenshots"])
@@ -151,6 +152,12 @@ with st.sidebar:
         ollama_base_url = st.text_input("Ollama BaseURL", st.session_state.ollama_base_url,
                                         placeholder="http://localhost:11434")
 
+    memory_size = st.selectbox("Memory Size", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], index=9)
+
+    if st.button("+ New Chat"):
+        st.session_state.llm_ready = False
+        st.session_state[chat_history_key] = []
+
     # Validation
     info = st.markdown("")
     if option == "OpenAI":
@@ -187,6 +194,13 @@ with st.sidebar:
         st.session_state.last_option = option
         st.session_state.llm_ready = False
 
+    if "last_memory_size" not in st.session_state:
+        st.session_state.last_memory_size = None
+
+    if memory_size != st.session_state.last_memory_size:
+        st.session_state.last_memory_size = memory_size
+        st.session_state.llm_ready = False
+
 logger.log(f"st.session_state.llm_ready={st.session_state.llm_ready}", level=logging.INFO)
 
 if not st.session_state.llm_ready:
@@ -200,6 +214,9 @@ with st.sidebar:
         if st.session_state.llm_ready:
             get_agent(st.session_state.agent_id).start_new_conversation()
 
+    if "last_file" not in st.session_state:
+        st.session_state.last_file = None
+
     if file is not None:
         file_obj = io.BytesIO(file.getvalue())
         file_ext = Path(file.name).suffix.lower()
@@ -210,10 +227,12 @@ with st.sidebar:
         grid.dataframe(df)
         counter.info("Total: **%s** records" % len(df))
 
-        # if not st.session_state.llm_ready:
-        st.session_state.agent_id = str(uuid.uuid4())
-        get_agent(st.session_state.agent_id).set_file_data(df)
-        st.session_state.llm_ready = True
+        if file != st.session_state.last_file or st.session_state.llm_ready is False:
+            # if not st.session_state.llm_ready:
+            st.session_state.agent_id = str(uuid.uuid4())
+            get_agent(st.session_state.agent_id).set_file_data(df)
+
+        st.session_state.last_file = file
 
 with st.sidebar:
     st.markdown("""
@@ -252,9 +271,6 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 # ChatBox layout
-chat_history_key = "chat_history"
-if chat_history_key not in st.session_state:
-    st.session_state[chat_history_key] = []
 
 for item in st.session_state.chat_history:
     with st.chat_message(item["role"]):
